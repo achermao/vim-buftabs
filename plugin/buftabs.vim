@@ -63,6 +63,7 @@ function! s:buftabs_show(deleted_buf)
   endif
   " Show original statusline
   let i = 1
+  let l:count = 1
   let s:list = ''
   let start = 0
   let end = 0
@@ -93,7 +94,9 @@ function! s:buftabs_show(deleted_buf)
         let s:list = s:list . ' '
       endif
 
-      let s:list = s:list . i . g:buftabs_separator
+      " CHG: acher.mao 2019-02-15 i是不连续的值，count是连续的值
+      "let s:list = s:list . i . g:buftabs_separator
+      let s:list = s:list . l:count . g:buftabs_separator
       let s:list = s:list . name
 
       if getbufvar(i, "&modified") == 1
@@ -106,6 +109,8 @@ function! s:buftabs_show(deleted_buf)
       else
         let s:list = s:list . ' '
       endif
+
+      let l:count = l:count + 1
     end
 
     let i = i + 1
@@ -115,11 +120,11 @@ function! s:buftabs_show(deleted_buf)
   " out the appropriate part
   let width = winwidth(0) - 12
 
-  if(start < from) 
+  if(start < from)
     let from = start - 1
   endif
   if end > from + width
-    let from = end - width 
+    let from = end - width
   endif
 
   let s:list = strpart(s:list, from, width)
@@ -132,7 +137,7 @@ function! s:buftabs_show(deleted_buf)
     let s:list2 = copy(s:list)
     let s:list2 = substitute(s:list2, "\x01", g:buftabs_marker_start, 'g')
     let s:list2 = substitute(s:list2, "\x02", g:buftabs_marker_end,   'g')
-    ""call s:echo_buftabs(s:list2)
+    "call s:echo_buftabs(s:list2)
   end
 
   if exists("g:buftabs_active_highlight_group")
@@ -160,11 +165,14 @@ function! s:buftabs_show(deleted_buf)
     "if match(&statusline, "%{buftabs#statusline()}") == -1
     if match(&statusline, s:list) == -1
       if exists("g:buftabs_statusline_highlight_group")
-        let s:original_left_statusline = '%=' . '%#' . g:buftabs_statusline_highlight_group . '#' . 
+        let s:original_left_statusline = '%=' . '%#' . g:buftabs_statusline_highlight_group . '#' .
               \ substitute(substitute(s:original_left_statusline, '^%=', '', ''), '%#.*#', '', '')
       endif
       "let &statusline = s:list . s:original_left_statusline
-      let &statusline = substitute(s:list, "\x03", "-", 'g') . s:original_left_statusline
+      "let &statusline = substitute(s:list, "\x03", "-", 'g') . s:original_left_statusline
+      " CHG: acher.mao 2019-02-15 增加文件编码显示
+      let right_statusline = ' | %{&fileencoding} %-8.(%l,%c%V%) %P'
+      let &statusline = substitute(s:list, "\x03", "-", 'g') . s:original_left_statusline . right_statusline
     end
   end
 
