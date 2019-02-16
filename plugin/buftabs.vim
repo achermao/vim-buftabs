@@ -15,7 +15,9 @@ set cpo&vim
 " }}}
 
 " Some variables {{{
-let s:original_left_statusline = matchstr(&statusline, "%=.*")
+" FIXED: acher.mao 2019-02-15 original_left_statusline 重复获取
+"let s:original_left_statusline = matchstr(&statusline, "%=.*")
+let s:original_left_statusline = get(s:, "original_left_statusline", matchstr(&statusline, "%=.*"))
 let s:original_statusline      = &statusline
 let g:buftabs_enabled          = get(g:, 'buftabs_enabled',          1)
 let g:buftabs_in_statusline    = get(g:, 'buftabs_in_statusline',    1)
